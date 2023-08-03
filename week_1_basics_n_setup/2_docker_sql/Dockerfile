@@ -1,8 +1,9 @@
 FROM python:3.9.1
 
-RUN pip install pandas
+RUN apt-get install wget
+RUN pip install sqlalchemy psycopg2 "dask[complete]"
 
 WORKDIR /app
-COPY pipeline.py pipeline.py
+COPY ingest_data_1.py ingest_data_1.py
 
-ENTRYPOINT [ "python", "pipeline.py" ]
+ENTRYPOINT [ "python", "ingest_data_1.py" ]
