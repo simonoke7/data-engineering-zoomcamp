@@ -19,20 +19,19 @@ def main(params):
 
     os.system(f"wget {url} -O {parquet_name}")
 
-    uri = f"postgresql://{user}:{password}@{host}:{port}/{db}"
-    engine = create_engine(uri)
+    pg_uri = f"postgresql://{user}:{password}@{host}:{port}/{db}"
+    engine = create_engine(pg_uri)
 
     # load parquet file as dataframe
-    df = pd.read_parquet(parquet_name)
-
-    # create dask dataframe with desired chunk size
-    ddf = dd.from_pandas(df, chunksize=100000)
-
-    ddf.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace')
+    ddf = dd.read_parquet("yellow_tripdata_2023-01.parquet", blocksize="2.5MB" )
     
+    df = ddf.get_partition(0)
+    df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace')
+
     t_start = time()
-    ddf.to_sql(name=table_name, con=engine, if_exists='append')
+    ddf.to_sql(name=table_name, uri=pg_uri, if_exists='append')
     t_end = time()
+
     print('data transfer took %.3f second' % (t_end - t_start))
 
 if __name__ == '__main__':

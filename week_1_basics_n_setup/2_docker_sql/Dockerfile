@@ -1,7 +1,7 @@
-FROM python:3.9.1
+FROM python:3.9.7
 
 RUN apt-get install wget
-RUN pip install sqlalchemy psycopg2 "dask[complete]"
+RUN pip install "pandas==1.3.4" "sqlalchemy==1.4.39" "psycopg2==2.8.6" "dask[complete]==2023.5.1"
 
 WORKDIR /app
 COPY ingest_data_1.py ingest_data_1.py
